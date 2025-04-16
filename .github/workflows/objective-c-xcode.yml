@@ -59,8 +59,10 @@ jobs:
         run: |
           echo "Creating build keychain..."
           security create-keychain -p "" build.keychain
+          security list-keychains -s build.keychain
           security default-keychain -s build.keychain
           security unlock-keychain -p "" build.keychain
+          security set-keychain-settings
 
       ##############################################################
       # 3-2. 인증서 설치
