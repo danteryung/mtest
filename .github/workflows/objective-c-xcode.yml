@@ -98,4 +98,4 @@ jobs:
           if [ $scheme = default ]; then scheme=$(cat default); fi
           if [ "`ls -A | grep -i \\.xcworkspace\$`" ]; then filetype_parameter="workspace" && file_to_build="`ls -A | grep -i \\.xcworkspace\$`"; else filetype_parameter="project" && file_to_build="`ls -A | grep -i \\.xcodeproj\$`"; fi
           file_to_build=`echo $file_to_build | awk '{$1=$1;print}'`
-          xcodebuild clean archive -scheme "$scheme" -configuration release -allowProvisioningUpdates
+          xcodebuild clean archive -scheme "$scheme" -configuration release -destination "generic/platform=iOS" -allowProvisioningUpdates
