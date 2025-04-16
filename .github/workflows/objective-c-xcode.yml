@@ -65,10 +65,8 @@ jobs:
         run: |
           echo "Creating build keychain..."
           security create-keychain -p "" build.keychain
-          security list-keychains -s build.keychain
           security default-keychain -s build.keychain
           security unlock-keychain -p "" build.keychain
-          security set-keychain-settings
 
       ##############################################################
       # 3-2. 인증서 설치
@@ -107,7 +105,7 @@ jobs:
           if [ $scheme = default ]; then scheme=$(cat default); fi
           if [ "`ls -A | grep -i \\.xcworkspace\$`" ]; then filetype_parameter="workspace" && file_to_build="`ls -A | grep -i \\.xcworkspace\$`"; else filetype_parameter="project" && file_to_build="`ls -A | grep -i \\.xcodeproj\$`"; fi
           file_to_build=`echo $file_to_build | awk '{$1=$1;print}'`
-          xcodebuild clean archive 
+          xcodebuild clean archive -scheme "$scheme" -archivePath "${{ github.workspace }}/build/"$scheme".xcarchive"
 
 
 
