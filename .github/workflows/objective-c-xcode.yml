@@ -38,7 +38,6 @@ jobs:
           echo $default | cat >default
           echo Using default scheme: $default
 
-
       ##############################################################
       # 3. 환경 구축
       # 3-1 키체인 초기화 - 임시 키체인 생성
@@ -85,4 +84,4 @@ jobs:
           if [ $scheme = default ]; then scheme=$(cat default); fi
           if [ "`ls -A | grep -i \\.xcworkspace\$`" ]; then filetype_parameter="workspace" && file_to_build="`ls -A | grep -i \\.xcworkspace\$`"; else filetype_parameter="project" && file_to_build="`ls -A | grep -i \\.xcodeproj\$`"; fi
           file_to_build=`echo $file_to_build | awk '{$1=$1;print}'`
-          xcodebuild clean build analyze -scheme "$scheme"
+          xcodebuild clean build analyze -scheme "$scheme" -configuration Debug
