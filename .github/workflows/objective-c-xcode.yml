@@ -70,7 +70,8 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           echo "${{ secrets.PROFILE_ADHOC_BASE64 }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/Adhoc.mobileprovision
           echo "${{ secrets.PROFILE_APPSTORE_BASE64 }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/Appstore.mobileprovision
-
+          cd ~/Library/MobileDevice/Provisioning\ Profiles
+          ls -l
 
       ##############################################################
       # 4. 앱 빌드
