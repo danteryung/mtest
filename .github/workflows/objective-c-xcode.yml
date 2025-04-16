@@ -54,8 +54,8 @@ jobs:
       - name: Configure Keychain 
         uses: apple-actions/import-codesign-certs@v3
         with: 
-          p12-file-base64: ${{ secrets.CERTIFICATE_BASE64 }}
-          p12-password: " "
+          p12-file-base64: ${{ secrets.APPSTORE_CERTIFICATES_FILE_BASE64 }}
+          p12-password: "123"
 
       # ##############################################################
       # # 3. 환경 구축
