@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     name: Build and analyse default scheme using xcodebuild command
-    runs-on: macos-14
+    runs-on: macos-latest
 
     steps:
       ##############################################################
@@ -24,6 +24,19 @@ jobs:
       ##############################################################
       # - name: Install CocoaPods Dependencies
       #   run: pod install
+
+
+      ##############################################################
+      # 2. Scheme 값 추출
+      ##############################################################    
+      - name: 'Download Provisioning Profiles'
+        uses: apple-actions/download-provisioning-profiles@v4
+        with:
+          bundle-id: 'com.uracle.mtest'
+          profile-type: 'IOS_APP_STORE'
+          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
+          api-key-id: ${{ secrets.APPSTORE_KEY_ID }}
+          api-private-key: ${{ secrets.APPSTORE_PRIVATE_KEY }}
 
 
       ##############################################################
