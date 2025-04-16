@@ -51,29 +51,35 @@ jobs:
           echo $default | cat >default
           echo Using default scheme: $default
 
-      ##############################################################
-      # 3. 환경 구축
-      # 3-1 키체인 초기화 - 임시 키체인 생성
-      ##############################################################    
       - name: Configure Keychain 
-        run: |
-          echo "Creating build keychain..."
-          security create-keychain -p "" build.keychain
-          security list-keychains -s build.keychain
-          security default-keychain -s build.keychain
-          security unlock-keychain -p "" build.keychain
-          security set-keychain-settings
+        uses: apple-actions/import-codesign-certs@v3
+        with: 
+          p12-file-base64: ${{ secrets.CERTIFICATE_BASE64 }}
+          p12-password: ""
 
-      ##############################################################
-      # 3-2. 인증서 설치
-      ##############################################################    
-      - name: Import Certificate
-        run: |
-          echo "Decoding certificate from Secrets..."
-          echo "${{ secrets.CERTIFICATE_BASE64 }}" | base64 --decode > certificate.p12
+      # ##############################################################
+      # # 3. 환경 구축
+      # # 3-1 키체인 초기화 - 임시 키체인 생성
+      # ##############################################################    
+      # - name: Configure Keychain 
+      #   run: |
+      #     echo "Creating build keychain..."
+      #     security create-keychain -p "" build.keychain
+      #     security list-keychains -s build.keychain
+      #     security default-keychain -s build.keychain
+      #     security unlock-keychain -p "" build.keychain
+      #     security set-keychain-settings
 
-          echo "Importing certificate..."
-          security import certificate.p12 -k build.keychain -P ""
+      # ##############################################################
+      # # 3-2. 인증서 설치
+      # ##############################################################    
+      # - name: Import Certificate
+      #   run: |
+      #     echo "Decoding certificate from Secrets..."
+      #     echo "${{ secrets.CERTIFICATE_BASE64 }}" | base64 --decode > certificate.p12
+
+      #     echo "Importing certificate..."
+      #     security import certificate.p12 -k build.keychain -P ""
 
 
       ##############################################################
