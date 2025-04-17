@@ -6,8 +6,15 @@
 	<string>export</string>
 	<key>method</key>
 	<string>release-testing</string>
+	<key>provisioningProfiles</key>
+	<dict>
+		<key>mcore.edu.mtest</key>
+		<string>mtest_adhoc</string>
+	</dict>
+	<key>signingCertificate</key>
+	<string>EA25CB304386111E77AA5B265F6DB174612739D2</string>
 	<key>signingStyle</key>
-	<string>automatic</string>
+	<string>manual</string>
 	<key>stripSwiftSymbols</key>
 	<true/>
 	<key>teamID</key>
