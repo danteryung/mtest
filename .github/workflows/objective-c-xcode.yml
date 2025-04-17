@@ -179,4 +179,15 @@ jobs:
         working-directory: ${{ env.IOS_PROJECT_PATH }}
 
 
+      ##############################################################
+      # 5. IPA파일 생성
+      ##############################################################    
+      - name: Upload IPA as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.SCHEME }}.ipa
+          path: build/${{ env.SCHEME }}.ipa
+
+        working-directory: ${{ env.IOS_PROJECT_PATH }}
+
 
