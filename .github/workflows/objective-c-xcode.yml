@@ -188,6 +188,5 @@ jobs:
           name: ${{ env.SCHEME }}.ipa
           path: build/${{ env.SCHEME }}.ipa
 
-        working-directory: ${{ env.IOS_PROJECT_PATH }}
 
 
