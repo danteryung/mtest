@@ -52,12 +52,11 @@ jobs:
       ##############################################################    
       - name: Set Default Scheme
         run: |
-          ls
-          cd mtest/native/ios/project
           scheme_list=$(xcodebuild -list -json | tr -d "\n")
           default=$(echo $scheme_list | ruby -e "require 'json'; puts JSON.parse(STDIN.gets)['project']['targets'][0]")
           echo $default | cat >default
           echo Using default scheme: $default
+        working-directory: ${{ env.PROJECT_PATH }}
 
       # - name: Configure Keychain 
       #   uses: apple-actions/import-codesign-certs@v3
