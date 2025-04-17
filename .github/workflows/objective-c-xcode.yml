@@ -174,7 +174,9 @@ jobs:
           xcodebuild -exportArchive \
             -archivePath "$GITHUB_WORKSPACE/build/$SCHEME.xcarchive" \
             -exportOptionsPlist exportOptions.plist \
-            -exportPath "$GITHUB_WORKSPACE/build"            
+            -exportPath "$GITHUB_WORKSPACE/build" \
+            -allowProvisioningUpdates
+                       
         working-directory: ${{ env.IOS_PROJECT_PATH }}
 
 
