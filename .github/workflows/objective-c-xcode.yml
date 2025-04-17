@@ -41,12 +41,13 @@ jobs:
         run: |
           scheme_list=$(xcodebuild -list -json | tr -d "\n")
           scheme=$(echo $scheme_list | ruby -e "require 'json'; puts JSON.parse(STDIN.gets)['project']['targets'][0]")
-          echo $scheme | cat >scheme
           echo Using scheme: $scheme
-
+          echo "SCHEME=$scheme" >> $GITHUB_ENV
+   
           if [ "`ls -A | grep -i \\.xcworkspace\$`" ]; then filetype_parameter="workspace" && file_to_build="`ls -A | grep -i \\.xcworkspace\$`"; else filetype_parameter="project" && file_to_build="`ls -A | grep -i \\.xcodeproj\$`"; fi
           file_to_build=`echo $file_to_build | awk '{$1=$1;print}'`
-          echo Using file: $file_to_build
+          echo Using file_to_build: $file_to_build
+          echo "FILE_TO_BUILD=$file_to_build" >> $GITHUB_ENV
 
         working-directory: ${{ env.IOS_PROJECT_PATH }}
 
@@ -112,11 +113,13 @@ jobs:
       # 4. 앱 빌드
       ##############################################################    
       - name: Build
+        env:
+          scheme: ${{ 'default' }}
         run: |
-          echo "build Target Scheme: $scheme"
-          echo "build Target File: $file_to_build"
+          echo "build Target Scheme: $SCHEME"
+          echo "build Target File: $FILE_TO_BUILD"
 
-          xcodebuild clean archive -scheme "$scheme" -archivePath "${{ github.workspace }}/build/"$scheme".xcarchive"
+          xcodebuild clean archive -scheme "$SCHEME" -archivePath "${{ github.workspace }}/build/"$scheme".xcarchive"
 
         working-directory: ${{ env.IOS_PROJECT_PATH }}
 
