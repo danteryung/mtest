@@ -11,10 +11,11 @@ jobs:
     name: Build and analyse default scheme using xcodebuild command
     runs-on: macos-latest
 
-    # 사용할 Secret 을 env 에 미리 노출
+    # 사용할 Secret의 프로비저닝 프로파일을 env에 설정
     env:
       PROFILE_APPSTORE: ${{ secrets.PROFILE_APPSTORE_BASE64 }}
       PROFILE_ADHOC: ${{ secrets.PROFILE_ADHOC_BASE64 }}
+      # PROFILE_...: ${{ secrets.... }}
 
     steps:
       ##############################################################
@@ -36,7 +37,7 @@ jobs:
       ##############################################################
       # 2-2. Scheme 값 추출
       ##############################################################    
-      - name: Set Default Scheme
+      - name: Set Default iOS Project Scheme
         run: |
           scheme_list=$(xcodebuild -list -json | tr -d "\n")
           default=$(echo $scheme_list | ruby -e "require 'json'; puts JSON.parse(STDIN.gets)['project']['targets'][0]")
@@ -88,27 +89,19 @@ jobs:
           echo "Installing provisioning profile..."
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
 
-          echo "🔍 PROFILE* 환경변수 목록 추출"
+          echo "PROFILE* 환경변수 목록 추출"
           for var in $(printenv | grep '^PROFILE' | cut -d= -f1); do
             echo "• 처리 중: $var"
-
-            # 1) Base64 디코딩하여 임시 .mobileprovision 파일 생성
             echo "${!var}" | base64 --decode > temp.mobileprovision
-
-            # 2) security cms 를 이용해 plist로 디코딩
             security cms -D -i temp.mobileprovision -o temp.plist
-
-            # 3) Plist에서 UUID 추출
             uuid=$(/usr/libexec/PlistBuddy -c 'Print :UUID' temp.plist)
             echo "  → profile UUID: $uuid"
-
-            # 4) 최종 위치로 복사
             cp temp.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/$uuid.mobileprovision
-
-            # 5) 임시 파일 정리
             rm temp.mobileprovision temp.plist
           done
-          
+
+
+
 
       ##############################################################
       # 4. 앱 빌드
@@ -117,12 +110,16 @@ jobs:
         env:
           scheme: ${{ 'default' }}
         run: |
-          ls
-          cd mtest/native/ios/project
           if [ $scheme = default ]; then scheme=$(cat default); fi
+
           if [ "`ls -A | grep -i \\.xcworkspace\$`" ]; then filetype_parameter="workspace" && file_to_build="`ls -A | grep -i \\.xcworkspace\$`"; else filetype_parameter="project" && file_to_build="`ls -A | grep -i \\.xcodeproj\$`"; fi
           file_to_build=`echo $file_to_build | awk '{$1=$1;print}'`
+
+          echo "🔨 빌드 대상 파일: $file_to_build (타입: $filetype_parameter)"
+
           xcodebuild clean archive -scheme "$scheme" -archivePath "${{ github.workspace }}/build/"$scheme".xcarchive"
+
+        working-directory: ${{ env.IOS_PROJECT_PATH }}
 
 
 
