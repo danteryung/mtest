@@ -120,7 +120,7 @@ jobs:
           echo "build Target File: $FILE_TO_BUILD"
 
           xcodebuild clean build \
-            -${FILE_TYPE} "$PROJECT_PATH/$FILE_TO_BUILD" \
+            -${FILE_TYPE} "$FILE_TO_BUILD" \
             -scheme "$SCHEME" \
             -configuration Debug
 
@@ -141,7 +141,7 @@ jobs:
               | tail -n1
           )
           xcodebuild test \
-            -${FILE_TYPE} "$PROJECT_PATH/$FILE_TO_BUILD" \
+            -${FILE_TYPE} "$FILE_TO_BUILD" \
             -scheme "$SCHEME" \
             -destination "platform=iOS Simulator,name=${SIMULATOR},OS=latest"
 
@@ -155,7 +155,7 @@ jobs:
       - name: Archive
         run: |
           xcodebuild clean archive \
-            -${FILE_TYPE} "$PROJECT_PATH/$FILE_TO_BUILD" \
+            -${FILE_TYPE} "$FILE_TO_BUILD" \
             -scheme "$SCHEME" \
             -configuration Release \
             -destination "generic/platform=iOS" \
