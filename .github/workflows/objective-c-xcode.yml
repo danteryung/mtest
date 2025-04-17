@@ -20,6 +20,14 @@ jobs:
 
 
       ##############################################################
+      # 2. 환경변수 추출
+      ##############################################################
+      - name: Locate Xcode project directory
+        run: |
+          echo "PROJECT_PATH=$(dirname $(find . -maxdepth 5 -name '*.xcodeproj' | head -n 1))" >> $GITHUB_ENV
+
+
+      ##############################################################
       # 1-2. CocoaPods 의존성 설치 (Podfile이 있을 경우)
       ##############################################################
       # - name: Install CocoaPods Dependencies
