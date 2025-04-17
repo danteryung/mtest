@@ -25,11 +25,11 @@ jobs:
       ##############################################################
       - name: Locate ios project directory
         run: |
-          echo "IOS_PROJECT_PATH=$(dirname $(find . -maxdepth 5 -name '*.xcodeprojzzz' | head -n 1))" >> $GITHUB_ENV
+          echo "IOS_PROJECT_PATH=$(dirname $(find . -maxdepth 5 -name '*.xcodeproj' | head -n 1))" >> $GITHUB_ENV
 
 
       ##############################################################
-      # 2-1. Scheme 값 추출
+      # 2-2. Scheme 값 추출
       ##############################################################    
       - name: Set Default Scheme
         run: |
@@ -41,12 +41,11 @@ jobs:
 
 
       ##############################################################
-      # 1-2. CocoaPods 의존성 설치 (Podfile이 있을 경우)
+      # 2-3. CocoaPods 의존성 설치 (Podfile이 있을 경우)
       ##############################################################
       # - name: Install CocoaPods Dependencies
       #   run: pod install
-
-
+      #   working-directory: ${{ env.IOS_PROJECT_PATH }}
 
 
 
@@ -61,6 +60,7 @@ jobs:
           security create-keychain -p "" build.keychain
           security default-keychain -s build.keychain
           security unlock-keychain -p "" build.keychain
+
 
       ##############################################################
       # 3-2. 인증서 설치
@@ -78,14 +78,31 @@ jobs:
       ##############################################################
       # 3-3. 프로비저닝 프로파일 설치
       ##############################################################
-      - name: Install Provisioning Profile
+      - name: Install Provisioning Profile from PROFILE* secrets
         run: |
           echo "Installing provisioning profile..."
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          echo "${{ secrets.PROFILE_ADHOC_BASE64 }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/Adhoc.mobileprovision
-          echo "${{ secrets.PROFILE_APPSTORE_BASE64 }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/Appstore.mobileprovision
-          cd ~/Library/MobileDevice/Provisioning\ Profiles
-          ls -l
+          echo "🔍 PROFILE* 환경변수 목록 추출"
+          for var in $(printenv | grep '^PROFILE' | cut -d= -f1); do
+            echo "• 처리 중: $var"
+
+            # 1) Base64 디코딩하여 임시 .mobileprovision 파일 생성
+            echo "${!var}" | base64 --decode > temp.mobileprovision
+
+            # 2) security cms 를 이용해 plist로 디코딩
+            security cms -D -i temp.mobileprovision -o temp.plist
+
+            # 3) Plist에서 UUID 추출
+            uuid=$(/usr/libexec/PlistBuddy -c 'Print :UUID' temp.plist)
+            echo "  → profile UUID: $uuid"
+
+            # 4) 최종 위치로 복사
+            cp temp.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/$uuid.mobileprovision
+
+            # 5) 임시 파일 정리
+            rm temp.mobileprovision temp.plist
+          done
+
 
       ##############################################################
       # 4. 앱 빌드
