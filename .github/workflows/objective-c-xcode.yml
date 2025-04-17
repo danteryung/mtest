@@ -47,6 +47,8 @@ jobs:
           if [ "`ls -A | grep -i \\.xcworkspace\$`" ]; then filetype_parameter="workspace" && file_to_build="`ls -A | grep -i \\.xcworkspace\$`"; else filetype_parameter="project" && file_to_build="`ls -A | grep -i \\.xcodeproj\$`"; fi
           file_to_build=`echo $file_to_build | awk '{$1=$1;print}'`
           echo Using file_to_build: $file_to_build
+          echo Using file_type: $filetype_parameter
+          echo "FILE_TYPE=$filetype_parameter" >> $GITHUB_ENV
           echo "FILE_TO_BUILD=$file_to_build" >> $GITHUB_ENV
 
         working-directory: ${{ env.IOS_PROJECT_PATH }}
@@ -97,7 +99,7 @@ jobs:
 
           echo "PROFILE* 환경변수 목록 추출"
           for var in $(printenv | grep '^PROFILE' | cut -d= -f1); do
-            echo "• 처리 중: $var"
+            echo "• Processing.. : $var"
             echo "${!var}" | base64 --decode > temp.mobileprovision
             security cms -D -i temp.mobileprovision -o temp.plist
             uuid=$(/usr/libexec/PlistBuddy -c 'Print :UUID' temp.plist)
@@ -113,16 +115,65 @@ jobs:
       # 4. 앱 빌드
       ##############################################################    
       - name: Build
-        env:
-          scheme: ${{ 'default' }}
         run: |
           echo "build Target Scheme: $SCHEME"
           echo "build Target File: $FILE_TO_BUILD"
 
-          xcodebuild clean archive -scheme "$SCHEME" -archivePath "${{ github.workspace }}/build/"$scheme".xcarchive"
+          xcodebuild clean build \
+            -${FILE_TYPE} "$PROJECT_PATH/$FILE_TO_BUILD" \
+            -scheme "$SCHEME" \
+            -configuration Debug
 
         working-directory: ${{ env.IOS_PROJECT_PATH }}
 
+
+
+      ##############################################################
+      # 4. 앱 빌드
+      ##############################################################    
+      - name: Run UI tests
+        run: |
+          SIMULATOR=$(
+            xcrun simctl list devices available \
+              | grep -E 'iPhone [0-9]+' \
+              | sed -E 's/.*(iPhone [0-9]+).*$/\1/' \
+              | sort -Vu \
+              | tail -n1
+          )
+          xcodebuild test \
+            -${FILE_TYPE} "$PROJECT_PATH/$FILE_TO_BUILD" \
+            -scheme "$SCHEME" \
+            -destination "platform=iOS Simulator,name=${SIMULATOR},OS=latest"
+
+        working-directory: ${{ env.IOS_PROJECT_PATH }}
+
+
+
+      ##############################################################
+      # 4. 앱 빌드
+      ##############################################################    
+      - name: Archive
+        run: |
+          xcodebuild clean archive \
+            -${FILE_TYPE} "$PROJECT_PATH/$FILE_TO_BUILD" \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -destination "generic/platform=iOS" \
+            -archivePath "$GITHUB_WORKSPACE/build/$SCHEME.xcarchive"
+            
+        working-directory: ${{ env.IOS_PROJECT_PATH }}
+
+
+
+      ##############################################################
+      # 4. 앱 빌드
+      ##############################################################    
+      - name: Export IPA
+        run: |
+          xcodebuild -exportArchive \
+            -archivePath "$GITHUB_WORKSPACE/build/$SCHEME.xcarchive" \
+            -exportPath "$GITHUB_WORKSPACE/build"            
+        working-directory: ${{ env.IOS_PROJECT_PATH }}
 
 
 
