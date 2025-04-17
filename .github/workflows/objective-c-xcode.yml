@@ -35,14 +35,19 @@ jobs:
 
 
       ##############################################################
-      # 2-2. Scheme 값 추출
+      # 2-2. Scheme & project 값 추출
       ##############################################################    
       - name: Set Default iOS Project Scheme
         run: |
           scheme_list=$(xcodebuild -list -json | tr -d "\n")
-          default=$(echo $scheme_list | ruby -e "require 'json'; puts JSON.parse(STDIN.gets)['project']['targets'][0]")
-          echo $default | cat >default
-          echo Using default scheme: $default
+          scheme=$(echo $scheme_list | ruby -e "require 'json'; puts JSON.parse(STDIN.gets)['project']['targets'][0]")
+          echo $scheme | cat >scheme
+          echo Using scheme: $scheme
+
+          if [ "`ls -A | grep -i \\.xcworkspace\$`" ]; then filetype_parameter="workspace" && file_to_build="`ls -A | grep -i \\.xcworkspace\$`"; else filetype_parameter="project" && file_to_build="`ls -A | grep -i \\.xcodeproj\$`"; fi
+          file_to_build=`echo $file_to_build | awk '{$1=$1;print}'`
+          echo Using file: $file_to_build
+
         working-directory: ${{ env.IOS_PROJECT_PATH }}
 
 
@@ -107,15 +112,9 @@ jobs:
       # 4. 앱 빌드
       ##############################################################    
       - name: Build
-        env:
-          scheme: ${{ 'default' }}
         run: |
-          if [ $scheme = default ]; then scheme=$(cat default); fi
-
-          if [ "`ls -A | grep -i \\.xcworkspace\$`" ]; then filetype_parameter="workspace" && file_to_build="`ls -A | grep -i \\.xcworkspace\$`"; else filetype_parameter="project" && file_to_build="`ls -A | grep -i \\.xcodeproj\$`"; fi
-          file_to_build=`echo $file_to_build | awk '{$1=$1;print}'`
-
-          echo "🔨 빌드 대상 파일: $file_to_build (타입: $filetype_parameter)"
+          echo "build Target Scheme: $scheme"
+          echo "build Target File: $file_to_build"
 
           xcodebuild clean archive -scheme "$scheme" -archivePath "${{ github.workspace }}/build/"$scheme".xcarchive"
 
