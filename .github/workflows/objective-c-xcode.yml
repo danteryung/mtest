@@ -11,6 +11,11 @@ jobs:
     name: Build and analyse default scheme using xcodebuild command
     runs-on: macos-latest
 
+    # 사용할 Secret 을 env 에 미리 노출
+    env:
+      PROFILE_APPSTORE: ${{ secrets.PROFILE_APPSTORE_BASE64 }}
+      PROFILE_ADHOC:     ${{ secrets.PROFILE_ADHOC_BASE64 }}
+
     steps:
       ##############################################################
       # 1. 소스체크아웃
@@ -78,29 +83,16 @@ jobs:
       ##############################################################
       # 3-3. 프로비저닝 프로파일 설치
       ##############################################################
-      - name: Install Provisioning Profile from PROFILE* secrets
+      - name: Install Provisioning Profile
         run: |
           echo "Installing provisioning profile..."
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          echo "🔍 PROFILE* 환경변수 목록 추출"
-          for var in $(printenv | grep '^PROFILE' | cut -d= -f1); do
-            echo "• 처리 중: $var"
-
-            # 1) Base64 디코딩하여 임시 .mobileprovision 파일 생성
+          for var in $(compgen -v | grep '^PROFILE_'); do
+            echo "Installing $var..."
             echo "${!var}" | base64 --decode > temp.mobileprovision
-
-            # 2) security cms 를 이용해 plist로 디코딩
-            security cms -D -i temp.mobileprovision -o temp.plist
-
-            # 3) Plist에서 UUID 추출
-            uuid=$(/usr/libexec/PlistBuddy -c 'Print :UUID' temp.plist)
-            echo "  → profile UUID: $uuid"
-
-            # 4) 최종 위치로 복사
+            uuid=$(security cms -D -i temp.mobileprovision | /usr/libexec/PlistBuddy -c 'Print :UUID' /dev/stdin)
             cp temp.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/$uuid.mobileprovision
-
-            # 5) 임시 파일 정리
-            rm temp.mobileprovision temp.plist
+            rm temp.mobileprovision
           done
 
 
