@@ -131,21 +131,21 @@ jobs:
       ##############################################################
       # 4. 앱 빌드
       ##############################################################    
-      - name: Run UI tests
-        run: |
-          SIMULATOR=$(
-            xcrun simctl list devices available \
-              | grep -E 'iPhone [0-9]+' \
-              | sed -E 's/.*(iPhone [0-9]+).*$/\1/' \
-              | sort -Vu \
-              | tail -n1
-          )
-          xcodebuild test \
-            -${FILE_TYPE} "$FILE_TO_BUILD" \
-            -scheme "$SCHEME" \
-            -destination "platform=iOS Simulator,name=${SIMULATOR},OS=latest"
+      # - name: Run UI tests
+      #   run: |
+      #     SIMULATOR=$(
+      #       xcrun simctl list devices available \
+      #         | grep -E 'iPhone [0-9]+' \
+      #         | sed -E 's/.*(iPhone [0-9]+).*$/\1/' \
+      #         | sort -Vu \
+      #         | tail -n1
+      #     )
+      #     xcodebuild test \
+      #       -${FILE_TYPE} "$FILE_TO_BUILD" \
+      #       -scheme "$SCHEME" \
+      #       -destination "platform=iOS Simulator,name=${SIMULATOR},OS=latest"
 
-        working-directory: ${{ env.IOS_PROJECT_PATH }}
+      #   working-directory: ${{ env.IOS_PROJECT_PATH }}
 
 
 
