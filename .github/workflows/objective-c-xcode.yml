@@ -180,7 +180,24 @@ jobs:
 
 
       ##############################################################
-      # 5. IPA파일 생성
+      # 4-4. IPA파일 생성
+      ##############################################################    
+      - name: Export IPA
+        run: |
+          echo "${{ secrets.APP_STORE_CONNECT_API_KEY_BASE64 }}" > AuthKey_${{ secrets.APPSTORE_KEY_ID }}.p8
+
+          xcrun altool --upload-app \
+          -f "$GITHUB_WORKSPACE/build/${{ env.SCHEME }}.ipa" \
+          --apiKey "${{ secrets.APPSTORE_KEY_ID }}" \
+          --apiIssuer "${{ secrets.APPSTORE_ISSUER_ID }}" \
+          --verbose
+
+        working-directory: ${{ env.IOS_PROJECT_PATH }}
+        
+
+
+      ##############################################################
+      # 5. artifact 생성
       ##############################################################    
       - name: Upload IPA as artifact
         uses: actions/upload-artifact@v4
