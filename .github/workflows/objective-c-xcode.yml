@@ -31,6 +31,7 @@ jobs:
       ##############################################################
       - name: Locate ios project directory
         run: |
+          ls -R | grep ":$" | sed -e 's/:$//' -e 's/[^-][^\/]*\//--/g' -e 's/^/ /' -e 's/-/|/'
           echo "IOS_PROJECT_PATH=$(dirname $(find . -maxdepth 5 -name '*.xcodeproj' | head -n 1))" >> $GITHUB_ENV
 
 
