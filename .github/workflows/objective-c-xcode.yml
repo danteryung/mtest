@@ -111,21 +111,21 @@ jobs:
 
 
 
-      ##############################################################
-      # 4. 앱 빌드
-      # 4-1 디버깅 빌드
-      ##############################################################    
-      - name: Build
-        run: |
-          echo "build Target Scheme: $SCHEME"
-          echo "build Target File: $FILE_TO_BUILD"
+      # ##############################################################
+      # # 4. 앱 빌드
+      # # 4-1 디버깅 빌드
+      # ##############################################################    
+      # - name: Build
+      #   run: |
+      #     echo "build Target Scheme: $SCHEME"
+      #     echo "build Target File: $FILE_TO_BUILD"
 
-          xcodebuild clean build \
-            -${FILE_TYPE} "$FILE_TO_BUILD" \
-            -scheme "$SCHEME" \
-            -configuration Debug
+      #     xcodebuild clean build \
+      #       -${FILE_TYPE} "$FILE_TO_BUILD" \
+      #       -scheme "$SCHEME" \
+      #       -configuration Debug
 
-        working-directory: ${{ env.IOS_PROJECT_PATH }}
+      #   working-directory: ${{ env.IOS_PROJECT_PATH }}
 
 
 
@@ -160,7 +160,7 @@ jobs:
             -scheme "$SCHEME" \
             -configuration Release \
             -destination "generic/platform=iOS" \
-            -archivePath "$GITHUB_WORKSPACE/build/$SCHEME.xcarchive"
+            -archivePath "$GITHUB_WORKSPACE/native/ios/project/build/$SCHEME.xcarchive"
             
         working-directory: ${{ env.IOS_PROJECT_PATH }}
 
@@ -172,9 +172,9 @@ jobs:
       - name: Export IPA
         run: |
           xcodebuild -exportArchive \
-            -archivePath "$GITHUB_WORKSPACE/build/$SCHEME.xcarchive" \
+            -archivePath "$GITHUB_WORKSPACE/native/ios/project/$SCHEME.xcarchive" \
             -exportOptionsPlist exportOptions.plist \
-            -exportPath "$GITHUB_WORKSPACE/build" 
+            -exportPath "$GITHUB_WORKSPACE/native/ios/project" 
 
         working-directory: ${{ env.IOS_PROJECT_PATH }}
 
