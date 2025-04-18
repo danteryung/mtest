@@ -31,7 +31,6 @@ jobs:
       ##############################################################
       - name: Locate ios project directory
         run: |
-          ls -R | grep ":$" | sed -e 's/:$//' -e 's/[^-][^\/]*\//--/g' -e 's/^/ /' -e 's/-/|/'
           echo "IOS_PROJECT_PATH=$(dirname $(find . -maxdepth 5 -name '*.xcodeproj' | head -n 1))" >> $GITHUB_ENV
 
 
@@ -187,10 +186,6 @@ jobs:
         run: |
           mkdir private_keys
           echo "${{ secrets.APPSTORE_PRIVATE_KEY }}" > private_keys/AuthKey_${{ secrets.APPSTORE_KEY_ID }}.p8
-
-          ls -R | sed -e 's/:$//' -e 's/[^-][^\/]*\//--/g' -e 's/^/ /' -e 's/-/|/'
-
-          tree
 
           xcrun altool --upload-app \
           --file "./build/${{ env.SCHEME }}.ipa" \
