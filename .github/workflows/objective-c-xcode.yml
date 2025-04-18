@@ -173,9 +173,9 @@ jobs:
       - name: Export IPA
         run: |
           xcodebuild -exportArchive \
-            -archivePath "$GITHUB_WORKSPACE/native/ios/project/build/$SCHEME.xcarchive" \
+            -archivePath "./build/$SCHEME.xcarchive" \
             -exportOptionsPlist exportOptions.plist \
-            -exportPath "$GITHUB_WORKSPACE/native/ios/project/build" 
+            -exportPath "./build" 
 
         working-directory: ${{ env.IOS_PROJECT_PATH }}
 
