@@ -192,7 +192,7 @@ jobs:
           -f "$GITHUB_WORKSPACE/native/ios/project/build/${{ env.SCHEME }}.ipa" \
           --apiKey "${{ secrets.APPSTORE_KEY_ID }}" \
           --apiIssuer "${{ secrets.APPSTORE_ISSUER_ID }}" \
-          --verbose
+          --verbose 
 
         working-directory: ${{ env.IOS_PROJECT_PATH }}
         
