@@ -91,7 +91,6 @@
  */
 - (WKWebViewConfiguration *)exWebViewConfiguration:(WKWebViewConfiguration *)configuration
 {
-    configuration.applicationNameForUserAgent
     return configuration;
 }
 
