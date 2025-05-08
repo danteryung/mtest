@@ -26,6 +26,8 @@
         [self.poperaWebview setInspectable:YES];
     }
     
+    self.poperaWebview.configuration.applicationNameForUserAgent = @"Mobile/NT Morpheus/NT CustomAgent";
+    
     // NavigationBar 는 사용하지 않으므로 Hidden
     self.navigationController.navigationBarHidden = YES;
 }
@@ -89,6 +91,7 @@
  */
 - (WKWebViewConfiguration *)exWebViewConfiguration:(WKWebViewConfiguration *)configuration
 {
+    configuration.applicationNameForUserAgent
     return configuration;
 }
 
